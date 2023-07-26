@@ -125,6 +125,17 @@ public class InterfaceBasedConverterCodecTests : FieldCodecTester<MyForeignLibra
     }
 
     protected override MyForeignLibraryInterface CreateValue() => new MyForeignLibraryType(12, "hi", DateTimeOffset.Now);
-    protected override bool Equals(MyForeignLibraryInterface left, MyForeignLibraryInterface right) => left.Equals(right);
+    protected override bool Equals(MyForeignLibraryInterface left, MyForeignLibraryInterface right) => ReferenceEquals(left, right) || left.Equals(right);
+    protected override MyForeignLibraryInterface[] TestValues => new MyForeignLibraryInterface[] { default, CreateValue() };
+}
+
+public class InterfaceBasedConverterCopierTests : CopierTester<MyForeignLibraryInterface, IDeepCopier<MyForeignLibraryInterface>>
+{
+    public InterfaceBasedConverterCopierTests(ITestOutputHelper output) : base(output)
+    {
+    }
+
+    protected override MyForeignLibraryInterface CreateValue() => new MyForeignLibraryType(12, "hi", DateTimeOffset.Now);
+    protected override bool Equals(MyForeignLibraryInterface left, MyForeignLibraryInterface right) => ReferenceEquals(left, right) || left.Equals(right);
     protected override MyForeignLibraryInterface[] TestValues => new MyForeignLibraryInterface[] { default, CreateValue() };
 }
