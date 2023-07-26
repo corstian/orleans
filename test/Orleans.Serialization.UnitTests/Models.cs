@@ -172,7 +172,14 @@ public class SomeClassWithSerializers
 
 namespace Orleans.Serialization.UnitTests
 {
-    public class MyForeignLibraryType
+    public interface MyForeignLibraryInterface
+    {
+        public int Num { get; set; }
+        public string String { get; set; }
+        public DateTimeOffset DateTimeOffset { get; set; }
+    }
+
+    public class MyForeignLibraryType : MyForeignLibraryInterface
     {
         public MyForeignLibraryType() { }
 
@@ -218,6 +225,23 @@ namespace Orleans.Serialization.UnitTests
         public MyForeignLibraryTypeSurrogate ConvertToSurrogate(in MyForeignLibraryType value)
             => new() { Num = value.Num, String = value.String, DateTimeOffset = value.DateTimeOffset };
         public void Populate(in MyForeignLibraryTypeSurrogate surrogate, MyForeignLibraryType value)
+        {
+            value.Num = surrogate.Num;
+            value.String = surrogate.String;
+            value.DateTimeOffset = surrogate.DateTimeOffset;
+        }
+    }
+
+    [RegisterConverter]
+    public sealed class MyForeignLibraryInterfaceSurrogateConverter : IConverter<MyForeignLibraryInterface, MyForeignLibraryTypeSurrogate>, IPopulator<MyForeignLibraryInterface, MyForeignLibraryTypeSurrogate>
+    {
+        public MyForeignLibraryInterface ConvertFromSurrogate(in MyForeignLibraryTypeSurrogate surrogate)
+            => new MyForeignLibraryType(surrogate.Num, surrogate.String, surrogate.DateTimeOffset);
+
+        public MyForeignLibraryTypeSurrogate ConvertToSurrogate(in MyForeignLibraryInterface value)
+            => new() { Num = value.Num, String = value.String, DateTimeOffset = value.DateTimeOffset };
+
+        public void Populate(in MyForeignLibraryTypeSurrogate surrogate, MyForeignLibraryInterface value)
         {
             value.Num = surrogate.Num;
             value.String = surrogate.String;
